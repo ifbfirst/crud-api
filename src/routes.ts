@@ -20,15 +20,25 @@ export const handleRequest = (req: any, res: any) => {
       }
       res.end(JSON.stringify(object));
     }
-  } else if (req.method === "POST" && parsedUrl.pathname === "/objects") {
+  } 
+  else if (req.method === "POST" && parsedUrl.pathname === "/objects") {
     let body = "";
     req.on("data", (chunk: string) => (body += chunk));
     req.on("end", () => {
-      const newObject = { ...JSON.parse(body), id: uuidv4() };
+      const parsedBody = JSON.parse(body);
+  
+      if (!parsedBody.username || typeof parsedBody.age !== "number" || !Array.isArray(parsedBody.hobbies)) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: "Missing required fields: username, age, hobbies" }));
+        return;
+      }
+  
+      const newObject = { ...parsedBody, id: uuidv4() };
       objects.push(newObject);
       res.end(JSON.stringify({ message: "Object was added", object: newObject }));
     });
-  } else if (req.method === "PUT" && parsedUrl.pathname?.startsWith("/objects/")) {
+  } 
+  else if (req.method === "PUT" && parsedUrl.pathname?.startsWith("/objects/")) {
     const id = parsedUrl.pathname.split("/")[2];
     let body = "";
     req.on("data", (chunk: string) => (body += chunk));
@@ -44,7 +54,8 @@ export const handleRequest = (req: any, res: any) => {
       objects[index] = updatedObject;
       res.end(JSON.stringify({ message: "Object was updated", object: updatedObject }));
     });
-  } else if (req.method === "DELETE" && parsedUrl.pathname?.startsWith("/objects/")) {
+  } 
+  else if (req.method === "DELETE" && parsedUrl.pathname?.startsWith("/objects/")) {
     const id = parsedUrl.pathname.split("/")[2];
     const index = objects.findIndex((obj) => obj.id === id);
     if (index === -1) {
@@ -55,7 +66,8 @@ export const handleRequest = (req: any, res: any) => {
 
     objects.splice(index, 1);
     res.end(JSON.stringify({ message: "Object was removed" }));
-  } else {
+  } 
+  else {
     res.writeHead(404);
     res.end(JSON.stringify({ error: "Page is not found" }));
   }
