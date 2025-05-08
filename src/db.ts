@@ -1,6 +1,6 @@
 import { User } from "./interfaces";
 
-export const objects:User[] = [{
+export const users:User[] = [{
     id: '1', username: 'Pavel',
     age: 30,
     hobbies: ['footbal']

@@ -1,5 +1,5 @@
 import url from "url";
-import { objects } from "./db";
+import { users } from "./db";
 import { v4 as uuidv4 } from "uuid";
 
 export const handleRequest = (req: any, res: any) => {
@@ -7,21 +7,22 @@ export const handleRequest = (req: any, res: any) => {
   res.setHeader("Content-Type", "application/json");
 
   if (req.method === "GET") {
-    if (parsedUrl.pathname === "/objects") {
-      res.end(JSON.stringify(objects));
-    } else if (parsedUrl.pathname?.startsWith("/objects/")) {
+    if (parsedUrl.pathname === "/users") {
+      res.end(JSON.stringify(users));
+    } else if (parsedUrl.pathname?.startsWith("/users/")) {
       const id = parsedUrl.pathname.split("/")[2];
-      const object = objects.find((obj) => obj.id === id);
       
-      if (!object) {
+      const user = users.find((user) =>user.id === id);
+      
+      if (!user) {
         res.writeHead(404);
-        res.end(JSON.stringify({ error: "Object is not found" }));
+        res.end(JSON.stringify({ error: "User is not found" }));
         return; 
       }
-      res.end(JSON.stringify(object));
+      res.end(JSON.stringify(user));
     }
   } 
-  else if (req.method === "POST" && parsedUrl.pathname === "/objects") {
+  else if (req.method === "POST" && parsedUrl.pathname === "/users") {
     let body = "";
     req.on("data", (chunk: string) => (body += chunk));
     req.on("end", () => {
@@ -34,38 +35,38 @@ export const handleRequest = (req: any, res: any) => {
       }
   
       const newObject = { ...parsedBody, id: uuidv4() };
-      objects.push(newObject);
-      res.end(JSON.stringify({ message: "Object was added", object: newObject }));
+     users.push(newObject);
+      res.end(JSON.stringify({ message: "User was added", object: newObject }));
     });
   } 
-  else if (req.method === "PUT" && parsedUrl.pathname?.startsWith("/objects/")) {
+  else if (req.method === "PUT" && parsedUrl.pathname?.startsWith("/users/")) {
     const id = parsedUrl.pathname.split("/")[2];
     let body = "";
     req.on("data", (chunk: string) => (body += chunk));
     req.on("end", () => {
-      const index = objects.findIndex((obj) => obj.id === id);
+      const index = users.findIndex((user) => user.id === id);
       if (index === -1) {
         res.writeHead(404);
-        res.end(JSON.stringify({ error: "Object is not found" }));
+        res.end(JSON.stringify({ error: "User is not found" }));
         return;
       }
       
-      const updatedObject = { ...objects[index], ...JSON.parse(body) }; 
-      objects[index] = updatedObject;
-      res.end(JSON.stringify({ message: "Object was updated", object: updatedObject }));
+      const updatedObject = { ...users[index], ...JSON.parse(body) }; 
+      users[index] = updatedObject;
+      res.end(JSON.stringify({ message: "User was updated", object: updatedObject }));
     });
   } 
   else if (req.method === "DELETE" && parsedUrl.pathname?.startsWith("/objects/")) {
     const id = parsedUrl.pathname.split("/")[2];
-    const index = objects.findIndex((obj) => obj.id === id);
+    const index = users.findIndex((user) => user.id === id);
     if (index === -1) {
       res.writeHead(404);
-      res.end(JSON.stringify({ error: "Object is not found" }));
+      res.end(JSON.stringify({ error: "User is not found" }));
       return;
     }
 
-    objects.splice(index, 1);
-    res.end(JSON.stringify({ message: "Object was removed" }));
+   users.splice(index, 1);
+    res.end(JSON.stringify({ message: "User was removed" }));
   } 
   else {
     res.writeHead(404);
